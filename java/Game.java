@@ -3,18 +3,24 @@
 //NOTE: be sure to change the package to reflect yours!
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.GridLayout;
-import android.widget.Spinner;
+import android.widget.ListAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Random;
+
 
 public class Game extends Activity {
 
@@ -36,14 +42,20 @@ public class Game extends Activity {
     ArrayList<String> shuffleAbs; // shuffled abbreviations
 
     HashMap<String, String> stateAbbs; // (state,abbreviation)
-
-
     HashMap<String, RowCol> boardhelpr; // (abbreviation, (row,col))
 
-    //ArrayAdapter<String> spindapter;
-    //ArrayAdapter<String> adapter;
+    ArrayAdapter<String> spindapter;
+    ArrayAdapter<String> adapter;
 
-    Spinner spin; // dropdown / dialog of selectable states
+    //Spinner spin; // dropdown / dialog of selectable states
+
+    Button selector;
+
+    int score;
+
+    //private AlertDialog.Builder statePicker;
+    //private AlertDialog.Builder builderC;
+    //AlertDialog actions;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,21 +66,47 @@ public class Game extends Activity {
 
         gridStr = new String[20][3];
         stateAbbs = new HashMap<>();
+        boardhelpr = new HashMap<>();
 
         states = new ArrayList<>();
         abbs = new ArrayList<>();
+        setstates = new ArrayList<>();
+        shuffleAbs = new ArrayList<>();
 
-        spin = (Spinner) findViewById(R.id.spinners);
+        selector = (Button) findViewById(R.id.selectstatebutton);
+
+        //spin = (Spinner) findViewById(R.id.spinners);
 
         setupStates();
 
         buildGrid();
+
+
+        /*statePicker = new AlertDialog.Builder(this);
+        statePicker.setTitle("Select State/Province");
+
+        statePicker.setPositiveButton("Yes",new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                //
+
+            }
+        });
+
+        statePicker.setNegativeButton("No", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                //
+
+            }
+        });
+
+        actions = statePicker.create();*/
     }
 
-    
+
     public void setupStates(){
 
-       vals = new String[]{"Alabama", "Alaska", "Arizona", "Arkansas",
+       keys = new String[]{"Alabama", "Alaska", "Arizona", "Arkansas",
                "California", "Colorado", "Connecticut", "Delaware",
                "Florida", "Georgia","Hawaii", "Idaho", "Illinois", "Indiana", "Iowa",
                "Kansas", "Kentucky", "Louisiana", "Maine", "Maryland", "Massachusetts", "Michigan",
@@ -80,7 +118,7 @@ public class Game extends Activity {
                "Ontario","Quebec", "Nova Scotia", "New Brunswick", "Manitoba", "British Columbia",
                "Prince Edward Island", "Saskatchewan", "Alberta", "Newfoundland & Labrador"};
 
-       keys = new String[]{"AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DE",
+       vals = new String[]{"AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DE",
                "FL", "GA", "HI", "ID", "IL", "IN", "IA", "KS",
                "KY", "LA", "ME", "MD", "MA", "MI", "MN", "MS", "MO",
                "MT", "NE", "NV", "NH", "NJ", "NM", "NY", "NC", "ND",
@@ -91,23 +129,24 @@ public class Game extends Activity {
         //states = (ArrayList<String>) Arrays.asList(keys);
        // abbs = (ArrayList<String>) Arrays.asList(vals);
 
-        // sets up abbreviation/state k/v pairs
+        // sets up state/abbreviation k/v pairs
         for(int i =0; i<keys.length; i++){
             stateAbbs.put(keys[i],vals[i]);
         }
 
         //states.addAll(Arrays.asList(vals));
 
-        for(String str : vals){
+        for(String str : keys){
             states.add(str);
         }
 
-        for(String str : keys){
+        for(String str : vals){
             abbs.add(str);
             shuffleAbs.add(str);
         }
         //TODO: MOVE SHUFFLER TO OWN METHOD FOR SAVE/LOAD/CONTINUE, OR CREATE SEPARATE METHOD TO SET UP FOR LOAD/SAVE/CONTINUE
 
+        score = 0;
 
         // randomizes the list of state abbreviations
         Collections.shuffle(shuffleAbs, new Random());
@@ -146,13 +185,6 @@ public class Game extends Activity {
 
                 counter++;
 
-                //TextView tv = new TextView(this);
-                /*tv.setBackgroundResource(R.drawable.gridbutton);
-                tv.setForeground(getDrawable(R.drawable.gridbutton));
-                tv.setText("VA");
-                tv.setGravity(Gravity.CENTER);
-                gl.addView(tv,pixels,pixels);*/
-
             }
         }
     }
@@ -161,13 +193,56 @@ public class Game extends Activity {
     //public int scoreCalculator(...){
     // ....
     // }
-    //public void bingoCheckr(...){
+    public void bingoCheckr(){
     // ...
-    // }
+
+        // state: +1
+        // row:   +3 bonus
+        // col: + 20 bonus
+
+        //full block/5 rows full: +10
+        //block strip: 5 vertical cells full: +5
+
+        /*
+
+        check:
+
+        rows     cols
+        0-4       0-2
+        5-9     0-2
+        10-14   0-2
+        15-19   0-2
+
+
+        block 1:
+
+        rows 0-4
+
+         */
+
+
+    }
+
+
+    public void stateSetter(String stateStr){
+
+        setstates.add(stateStr);
+        score++;
+
+        String stateAb = stateAbbs.get(stateStr);
+
+        RowCol loc = boardhelpr.get(stateAb);
+
+        int row = loc.getRow();
+        int col = loc.getCol();
+
+        cells[row][col].setBackgroundResource(R.drawable.marker);
+
+    }
 
     // TODO: WIP
     // method that performs actions after user selects state
-    public void selectState() { //public void selectState(String stateStr)
+    public void selectState(View v) { //public void selectState(String stateStr)
 
         //TODO:
         // pop state from list of available states, rebuild spinner adapter
@@ -180,15 +255,61 @@ public class Game extends Activity {
         // mark state on board
 
 
-    }
+        ArrayList<String> thing = new ArrayList<>();
+
+        for(String str : states) {
+
+            if (!setstates.contains(str)) {
+
+                thing.add(str);
+            }
+        }
+
+        final String[] sts = thing.toArray(new String[thing.size()]);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Choose State");
+
+        ListAdapter adapter = new ArrayAdapter<String>(this, R.layout.dialogcustom, R.id.dialogtext, thing);
 
 
-    public void onClickState(View v) {
+        final int[] chosen = {0};
+        final String[] statechosen = {""};
 
-        //IMPLEMENT SPINNER HERE
-        // user selects state, state is passed to selectState
+        final String[] statechosenS = {""};
+        builder.setSingleChoiceItems(adapter, 0, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
 
-        selectState(); // selectState(state selected from dialog/spinner)
+                //String toaster = "Chose " + sts[which];
+
+                String stateC = stateAbbs.get(sts[which]);
+
+                String toaster = "Selected " + sts[which] + " " +stateC;
+
+                chosen[0] = which;
+                statechosen[0] = stateC;
+                statechosenS[0] = sts[which];
+
+                Toast.makeText(getApplicationContext(), toaster , Toast.LENGTH_SHORT).show();
+
+            }
+        });
+
+        builder.setPositiveButton("Add", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+                String stateF = statechosenS[0];
+
+                stateSetter(stateF);
+
+            }
+        });
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
+
 
     }
 
