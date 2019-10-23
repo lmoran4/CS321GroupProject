@@ -14,3 +14,7 @@ If you look in your files:
 ... /AndroidStudioProject/StatePlateBingo/...
 
 StatePlateBingo should be a folder.
+
+
+ALSO, IN ANDROID STUDIO, DON'T STICK ANY JAVA FILES IN THE FOLDERS TAGGED WITH (test), (androidTest). Just stick them
+under the untagged folder.
