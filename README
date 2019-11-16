@@ -1,5 +1,7 @@
 How to upload an AS project:
 
+DO NOT UPLOAD THE ENTIRE PROJECT FOLDER. Seriously, it's huge. Just don't do it, kthx.
+
 Open up AndroidStudioProjects folder.
 
 ... /AndroidStudioProjects/PROJECTNAME/app/src/main/
