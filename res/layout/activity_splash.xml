@@ -6,6 +6,7 @@
     android:layout_height="match_parent"
     tools:context=".Splash">
 
+
     <Button
         android:id="@+id/how2play"
         android:layout_width="170dp"
@@ -13,6 +14,7 @@
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="149dp"
+        android:onClick="goToHowTo"
         android:text="How To" />
 
     <Button
@@ -22,23 +24,27 @@
         android:layout_above="@+id/how2play"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="-148dp"
+        android:onClick="savedTrips"
         android:text="Saved Trips" />
 
     <Button
         android:id="@+id/newgame"
         android:layout_width="170dp"
         android:layout_height="60dp"
-        android:layout_below="@+id/button5"
+        android:layout_below="@+id/cont"
         android:layout_centerHorizontal="true"
         android:onClick="gotoGame"
-        android:text="New Game" />
+        android:text="New Game"
+        />
 
     <Button
-        android:id="@+id/button5"
+        android:id="@+id/cont"
         android:layout_width="170dp"
         android:layout_height="60dp"
         android:layout_below="@+id/how2play"
         android:layout_centerHorizontal="true"
-        android:text="b???" />
+        android:onClick="resumeGame"
+        android:text="continue" />
+
 
 </RelativeLayout>
