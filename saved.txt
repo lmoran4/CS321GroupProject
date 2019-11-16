@@ -1,0 +1,62 @@
+GAMEID
+SCORE: 8
+Wisconsin,WI,0,0,false
+Pennsylvania,PA,0,1,false
+Alaska,AK,0,2,true
+Virginia,VA,1,0,false
+Alabama,AL,1,1,false
+Wyoming,WY,1,2,false
+Oklahoma,OK,2,0,false
+Colorado,CO,2,1,true
+Kentucky,KY,2,2,false
+Nova Scotia,NS,3,0,false
+West Virginia,WV,3,1,false
+Nebraska,NE,3,2,false
+Georgia,GA,4,0,false
+South Dakota,SD,4,1,false
+Montana,MT,4,2,false
+North Dakota,ND,5,0,false
+Idaho,ID,5,1,false
+Minnesota,MN,5,2,false
+Louisiana,LA,6,0,false
+New Hampshire,NH,6,1,false
+Manitoba,MB,6,2,false
+Hawaii,HI,7,0,false
+Ohio,OH,7,1,true
+North Carolina,NC,7,2,false
+Massachusetts,MA,8,0,false
+Indiana,IN,8,1,false
+Oregon,OR,8,2,false
+Connecticut,CT,9,0,false
+Saskatchewan,SK,9,1,false
+Missouri,MO,9,2,false
+New York,NY,10,0,false
+Illinois,IL,10,1,false
+Florida,FL,10,2,true
+Utah,UT,11,0,false
+Texas,TX,11,1,false
+Maryland,MD,11,2,false
+Arkansas,AR,12,0,false
+Rhode Island,RI,12,1,false
+Nevada,NV,12,2,false
+Delaware,DE,13,0,false
+Ontario,ON,13,1,true
+Newfoundland & Labrador,NL,13,2,false
+Iowa,IA,14,0,false
+New Mexico,NM,14,1,true
+Prince Edward Island,PE,14,2,false
+Alberta,AB,15,0,false
+Michigan,MI,15,1,false
+Quebec,QC,15,2,false
+British Columbia,BC,16,0,false
+New Brunswick,NB,16,1,false
+New Jersey,NJ,16,2,false
+South Carolina,SC,17,0,false
+Tennessee,TN,17,1,false
+Vermont,VT,17,2,false
+Kansas,KS,18,0,true
+Maine,ME,18,1,true
+California,CA,18,2,false
+Mississippi,MS,19,0,false
+Washington,WA,19,1,false
+Arizona,AZ,19,2,false
