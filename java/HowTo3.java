@@ -6,25 +6,36 @@ import android.support.v7.app.AppCompatActivity;
 //import androidx.appcompat.app.AppCompatActivity;
 import android.view.View;
 
-public class HowTo extends AppCompatActivity {
+public class HowTo3 extends AppCompatActivity {
 
     String calledby;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_how_to);
+        setContentView(R.layout.activity_how_to3);
 
         Intent intent = getIntent();
 
         calledby = intent.getStringExtra("CALLER");
     }
 
-    public void goToNextPage(View v){
+    public void goToPrevPage(View v){
         Intent intent = new Intent(this, HowTo2.class);
-
         intent.putExtra("CALLER", calledby);
 
+        this.startActivity(intent);
+    }
+
+    public void goToNextPage(View v){
+        Intent intent = new Intent(this, HowTo.class);
+
+        intent.putExtra("CALLER", calledby);
+        this.startActivity(intent);
+    }
+
+    public void goToMainMenu(View v){
+        Intent intent = new Intent(this, Splash.class);
         this.startActivity(intent);
     }
 
@@ -47,19 +58,12 @@ public class HowTo extends AppCompatActivity {
 
             this.startActivity(intent);
 
+
+
         }
 
+
+
+
     }
-
-
-
-    public void goToMainMenu(View v){
-        Intent intent = new Intent(this, Splash.class);
-
-        //intent.putExtra("CALLER", calledby);
-
-        this.startActivity(intent);
-    }
-
 }
-
