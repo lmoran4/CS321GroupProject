@@ -1,0 +1,65 @@
+// checks all rows and blocks. DOES NOT UPDATE SCORE.
+    private void rowCheckLoad(int row, int col){
+
+        if(row < 5) {
+            boolean allTrue = true;
+            for (int j = 0; j < 3; j++) {
+                if (!cellCheck[row][j]) {
+                    allTrue = false;
+                    break;
+                }
+            }
+
+            if (allTrue) {
+                block1rows[row] = true;
+                
+            }
+        }
+
+        if(row < 10 && row >=5) {
+            boolean allTrue = true;
+            for (int j = 0; j < 3; j++) {
+
+                if (!cellCheck[row][j]) {
+                    allTrue = false;
+                    break;
+                }
+            }
+
+            if (allTrue) {
+                block2rows[row-5] = true;
+            }
+        }
+
+        if(row < 15 && row >= 10) {
+            boolean allTrue = true;
+            for (int j = 0; j < 3; j++) {
+
+                if (!cellCheck[row][j]) {
+                    allTrue = false;
+                    break;
+                }
+            }
+
+            if (allTrue) {
+                block3rows[row-10] = true;
+            }
+        }
+        
+        if(row < 20 && row >= 15) {
+
+            boolean allTrue = true;
+
+            for (int j = 0; j < 3; j++) {
+
+                if (!cellCheck[row][j]) {
+                    allTrue = false;
+                    break;
+                }
+            }
+
+            if (allTrue) {
+                block4rows[row-15] = true;
+            }
+        }
+    }
