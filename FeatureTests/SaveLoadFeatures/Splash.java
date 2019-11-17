@@ -43,18 +43,11 @@ public class Splash extends AppCompatActivity {
 
     public void gotoGame(View v){
 
-        //if(calledby.isEmpty()){
-
             Intent intent = new Intent(this, Game.class);
 
             GameState.getInstance().setValue(true);
 
             this.startActivity(intent);
-       // }
-
-
-
-      //  else { }
     }
 
     public void goToHowTo(View v){

@@ -8,7 +8,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -27,8 +26,6 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -94,7 +91,7 @@ public class Game extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_game); // links com.example.stateplatebingo.Game.java to activity_game.xml
+        setContentView(R.layout.activity_game);
 
         //if a continued game, we get the .txt file and put it into a String
         boolean isNewGame = GameState.getInstance().getValue();
@@ -103,30 +100,10 @@ public class Game extends Activity {
             lines = SavedTXT.split(System.getProperty("line.separator"));
         }
 
-        //final TextView output = findViewById(R.id.output); //Don't need?
-        //final EditText enterText = findViewById(R.id.enterText); //Don't need?
         save = findViewById(R.id.button4);
         save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //if (!toSaveTXT.isEmpty()) {
-                    //File file = new File(Game.this.getFilesDir(), "text");
-                    /*File file = new File(Game.this.getFilesDir(), "assets");
-                    if (!file.exists()) {
-                        file.mkdir();
-                    }
-                    try {
-                        File gpxfile = new File(file, "file.txt");
-                        FileWriter writer = new FileWriter(gpxfile);
-                        //writer.append(enterText.getText().toString());
-                        writer.write(combineStrings());
-                        //writer.write(getMarkedStates());//Will have to do this instead of above line.
-                        writer.flush();
-                        writer.close();
-                        //output.setText(readFile()); //Don't need this as I am not outputting text to screen, I already have that part planned
-                        Toast.makeText(Game.this, "Saved your game", Toast.LENGTH_LONG).show();
-                    } catch (Exception e) { }*/
-                //}
                 File file = new File(Game.this.getFilesDir(), "text");
                 if (!file.exists()) {
                     file.mkdir();
@@ -134,11 +111,9 @@ public class Game extends Activity {
                 try {
                     File gpxfile = new File(file, "sample");
                     FileWriter writer = new FileWriter(gpxfile);
-                    //writer.append(enterText.getText().toString());
                     writer.write(combineStrings());
                     writer.flush();
                     writer.close();
-                    //output.setText(readFile());
                     Toast.makeText(Game.this, "Saved your game", Toast.LENGTH_LONG).show();
                 } catch (Exception e) { }
             }
@@ -204,11 +179,6 @@ public class Game extends Activity {
         for(String str : keys){
             states.add(str);
         }
-
-        /*for(String str : vals){
-            //abbs.add(str);
-            shuffleAbs.add(str);
-        }*/
         //TODO: MOVE SHUFFLER TO OWN METHOD FOR SAVE/LOAD/CONTINUE, OR CREATE SEPARATE METHOD TO SET UP FOR LOAD/SAVE/CONTINUE
 
         /*score = 0;
@@ -228,17 +198,15 @@ public class Game extends Activity {
         }
         else{
         //read text file to assign states to correct position
-        //scan = new Scanner(SavedTXT);
-            //shuffleAbs.add(fileTXT.nextLine());
+
             Scanner scan = new Scanner(SavedTXT);
             for(int i = 0; i < 60; i++){
-                //shuffleAbs.add(fileTXT.nextLine());
                 shuffleAbs.add(lines[i]);
 
             }
-            buildGrid();
+            //buildGrid();
 
-            buildBlocks();
+            //buildBlocks();
         }
 
         score = 0;
@@ -780,48 +748,7 @@ public class Game extends Activity {
         } catch (IOException e) { }
         String result = text.toString();
         SavedTXT = result.replace("\r", "");
-        //return result;
     }
-
-        /*try {
-            BufferedReader reader = new BufferedReader(new InputStreamReader(getAssets().open("file.txt")));
-            String line;
-            Log.e("Reader Stuff",reader.readLine());
-            /*while ((line = reader.readLine()) != null) {
-                Log.e("code",line);
-                String[] RowData = line.split(",");
-                LatLng centerXY = new LatLng(Double.valueOf(RowData[1]), Double.valueOf(RowData[2]));
-                if (RowData.length == 4) {
-                    mMap.addMarker(new MarkerOptions().position(centerXY).title(String.valueOf(RowData[0]) + String.valueOf(RowData[3])).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
-                }
-            }*/
-            /*while((line = reader.readLine()) !=null)
-            {
-                Log.e("code",line);
-                SavedTXT = SavedTXT.concat(line);
-                SavedTXT = SavedTXT.concat("\n");
-            }
-
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }*/
-        //return "";
-    //}
-        /*String text = "";
-        try{
-            InputStream is = getAssets().open("file.txt");
-            int size = is.available();
-            byte[] buffer = new byte[size];
-            is.read(buffer);
-            is.close();
-            text = new String(buffer);
-        } catch(IOException ex){
-            ex.printStackTrace();
-        }
-        SavedTXT = text.replace("\r", "");
-
-        //return text;
-    }*/
 
     public String combineStrings(){
         String states = getAbsOrder();
