@@ -6,19 +6,19 @@
     android:layout_height="match_parent"
     tools:context=".HowTo3">
 
-    <TextView
-        android:id="@+id/textView"
-        android:layout_width="303dp"
-        android:layout_height="115dp"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="101dp"
-        android:gravity="center"
-        android:textStyle="bold"
-        android:text="PAGE 3"
-        android:textSize="24sp"
-        tools:layout_editor_absoluteX="163dp"
-        tools:layout_editor_absoluteY="145dp" />
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/button3"
+        android:layout_marginBottom="25dp"
+        android:layout_marginLeft="25dp"
+        android:layout_marginRight="25dp"
+        android:layout_marginTop="25dp"
+        android:adjustViewBounds="true"
+        android:scaleType="fitXY"
+
+        app:srcCompat="@drawable/p3_scaled" />
 
     <Button
         android:id="@+id/buttona"
@@ -46,4 +46,5 @@
         android:layout_centerHorizontal="true"
         android:onClick="returnTo"
         android:text="Return" />
+
 </RelativeLayout>
