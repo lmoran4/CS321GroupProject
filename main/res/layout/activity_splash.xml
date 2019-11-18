@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".com.example.stateplatebingo.Splash">
+
+    <Button
+        android:id="@+id/how2play"
+        android:layout_width="170dp"
+        android:layout_height="60dp"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="149dp"
+        android:onClick="gotoGame"
+        android:text="New Game" />
+
+    <Button
+        android:id="@+id/trips"
+        android:layout_width="170dp"
+        android:layout_height="60dp"
+        android:layout_above="@+id/how2play"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="-148dp"
+        android:onClick="resumeGame"
+        android:text="Continue Game" />
+
+    <Button
+        android:id="@+id/newgame"
+        android:layout_width="170dp"
+        android:layout_height="60dp"
+        android:layout_below="@+id/button5"
+        android:layout_centerHorizontal="true"
+        android:text="Saved Games" />
+
+    <Button
+        android:id="@+id/button5"
+        android:layout_width="170dp"
+        android:layout_height="60dp"
+        android:layout_below="@+id/how2play"
+        android:layout_centerHorizontal="true"
+        android:onClick="goToHowTo"
+        android:text="How To Play" />
+
+</RelativeLayout>
