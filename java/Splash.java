@@ -2,10 +2,14 @@ package com.example.leila.stateplatebingo;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
-//import androidx.appcompat.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Toast;
+
+import java.io.File;
+
+//import androidx.appcompat.app.AppCompatActivity;
 
 
 /*
@@ -43,7 +47,7 @@ public class Splash extends AppCompatActivity {
 
      */
 
-        calledby="";
+        this.calledby="";
 
         try{
 
@@ -68,7 +72,28 @@ public class Splash extends AppCompatActivity {
 
         try {
 
-            if (calledby.equals("Game")) {
+            if(calledby==null){
+
+                String thing = Environment.getExternalStorageDirectory().getAbsolutePath()+"/StatePlateBingo";
+                File file = new File(thing, "continue.txt");
+
+                if (!file.exists()) {
+                    Toast.makeText(getApplicationContext(), "No save found!" , Toast.LENGTH_SHORT).show();
+                }
+
+                else {
+                    Intent intent = new Intent(this, Game.class);
+
+                    String cont = "yes";
+                    intent.putExtra("CONT", cont);
+
+                    this.startActivity(intent);
+
+                }
+
+            }
+
+            else if (calledby.equals("Game")) {
 
                 Intent intent = new Intent(this, Game.class);
 
@@ -77,12 +102,11 @@ public class Splash extends AppCompatActivity {
 
             }
 
-            else {
-                Toast.makeText(getApplicationContext(), "Feature: Resume game after closing app. Coming soon!", Toast.LENGTH_SHORT).show();
-            }
+
 
         }catch (Exception e){
             Toast.makeText(getApplicationContext(), "Feature: Resume game after closing app. Coming soon!", Toast.LENGTH_SHORT).show();
+            e.printStackTrace();
         }
 
     }

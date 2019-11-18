@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Environment;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -14,18 +15,27 @@ import android.widget.ListAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Random;
 
 
 public class Game extends Activity {
 
+    String hasCont;
+
     private GridLayout gl; // layout for grid
 
     // gridStr is for future unit tests/saving/etc
-    private String[][] gridStr;                      // NEED TO SAVE
+    private String[][] gridStr;
 
     StateObject[][] cellar;
 
@@ -33,28 +43,19 @@ public class Game extends Activity {
 
     private TextView[][] cells; // the grid cells
 
-
-    // possibly used for saving/loading
-    //HashMap<String,String> stateFileStrs; //state, str
-
-    // String[] keys;
-    // String[] vals;
-
     ArrayList<String> states;
-    //ArrayList<String> abbs;
 
-    ArrayList<String> setstates; // states chosen by user           // NEED TO SAVE
+    ArrayList<String> setstates; // states chosen by user
     ArrayList<String> shuffleAbs; // shuffled abbreviations
 
+    HashMap<String, String> AbbState; // (abbreviation,state)
 
-    HashMap<String, String> AbbState; // (abbreviation,state)       // DO NOT NEED TO SAVE
-
-    HashMap<String, String> stateAbbs; // (state,abbreviation)       // DO NOT NEED TO SAVE
-    HashMap<String, StateObject> boardhelpr; // (abbreviation, (row,col)) // NEED TO SAVE
+    HashMap<String, String> stateAbbs; // (state,abbreviation)
+    HashMap<String, StateObject> boardhelpr; // (abbreviation, (row,col))
 
     private Button selector;
 
-    private int score;         // NEED TO SAVE
+    private int score;
 
     private TextView scoreView;
 
@@ -69,13 +70,12 @@ public class Game extends Activity {
 
     boolean[] allCols;
 
-    //boolean[] blocks;
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game); // links Game.java to activity_game.xml
+
+        hasCont="";
 
         this.gl = (GridLayout) findViewById(R.id.board);
 
@@ -84,6 +84,11 @@ public class Game extends Activity {
         boardhelpr = new HashMap<>();
         AbbState = new HashMap<>();
         // stateFileStrs = new HashMap<>();
+
+        cells = new TextView[20][3];
+        cellCheck = new boolean[20][3];
+
+        cellar = new StateObject[20][3]; // arrays of StateObjects corresponding to grid position
 
         states = new ArrayList<>();
         // abbs = new ArrayList<>();
@@ -94,11 +99,90 @@ public class Game extends Activity {
 
         this.scoreView = (TextView) findViewById(R.id.scoreview);
 
+        Intent intent = getIntent();
+
+        hasCont = intent.getStringExtra("CONT");
+
+        if(hasCont==null){
+            newGame();
+        }
+        else if(hasCont.equals("yes")){
+            loadGame();
+        }
+
+    }
+
+    private void newGame(){
         setupStates();
-
         buildGrid();
-
         buildBlocks();
+
+    }
+
+    private void loadGame(){
+
+        try {
+
+            String thing = Environment.getExternalStorageDirectory().getAbsolutePath() + "/StatePlateBingo";
+            File file = new File(thing, "continue.txt");
+
+            if (!file.exists()) {
+                Toast.makeText(getApplicationContext(), "No save found! Launching new game.", Toast.LENGTH_SHORT).show();
+
+                newGame();
+            }
+
+            if (file.exists()) {
+
+                if (file.length() == 0) {
+                    newGame();
+                }
+
+
+                stateZipper();
+                buildBlocks();
+                gameReader();
+                buildGridLoader();
+
+            }
+        }catch (Exception e){
+            //e.printStackTrace();
+        }
+
+    }
+
+    private void stateZipper(){
+        String[] keys = new String[]{"Alabama", "Alaska", "Arizona", "Arkansas",
+                "California", "Colorado", "Connecticut", "Delaware",
+                "Florida", "Georgia","Hawaii", "Idaho", "Illinois", "Indiana", "Iowa",
+                "Kansas", "Kentucky", "Louisiana", "Maine", "Maryland", "Massachusetts", "Michigan",
+                "Minnesota", "Mississippi", "Missouri", "Montana", "Nebraska", "Nevada",
+                "New Hampshire", "New Jersey", "New Mexico", "New York", "North Carolina", "North Dakota",
+                "Ohio", "Oklahoma", "Oregon", "Pennsylvania", "Rhode Island",
+                "South Carolina", "South Dakota", "Tennessee", "Texas", "Utah",
+                "Vermont", "Virginia", "Washington", "West Virginia", "Wisconsin", "Wyoming",
+                "Ontario","Quebec", "Nova Scotia", "New Brunswick", "Manitoba", "British Columbia",
+                "Prince Edward Island", "Saskatchewan", "Alberta", "Newfoundland & Labrador"};
+
+        String[] vals = new String[]{"AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DE",
+                "FL", "GA", "HI", "ID", "IL", "IN", "IA", "KS",
+                "KY", "LA", "ME", "MD", "MA", "MI", "MN", "MS", "MO",
+                "MT", "NE", "NV", "NH", "NJ", "NM", "NY", "NC", "ND",
+                "OH", "OK", "OR", "PA", "RI", "SC", "SD", "TN", "TX",
+                "UT", "VT", "VA", "WA", "WV", "WI", "WY",
+                "ON","QC","NS","NB","MB","BC","PE","SK","AB","NL"};
+
+        // sets up state/abbreviation k/v pairs,
+        // abb/state
+        for(int i =0; i<keys.length; i++){
+            stateAbbs.put(keys[i],vals[i]);
+            AbbState.put(vals[i],keys[i]);
+        }
+
+        for(String str : keys){
+            states.add(str);
+        }
+
     }
 
 
@@ -140,7 +224,6 @@ public class Game extends Activity {
             // abbs.add(str);
             shuffleAbs.add(str);
         }
-        //TODO: MOVE SHUFFLER TO OWN METHOD FOR SAVE/LOAD/CONTINUE, OR CREATE SEPARATE METHOD TO SET UP FOR LOAD/SAVE/CONTINUE
 
         score = 0;
 
@@ -149,8 +232,6 @@ public class Game extends Activity {
         // randomizes the list of state abbreviations
         Collections.shuffle(shuffleAbs, new Random());
     }
-
-
 
 
     private void buildBlocks(){
@@ -181,13 +262,8 @@ public class Game extends Activity {
         }
     }
 
-    // FIX FOR LOADING
+
     private void buildGrid(){
-
-        cells = new TextView[20][3];
-        cellCheck = new boolean[20][3];
-
-        cellar = new StateObject[20][3];
 
         // scales cells with screen size
         final float scale = this.getResources().getDisplayMetrics().density;
@@ -217,10 +293,6 @@ public class Game extends Activity {
 
                 cellar[i][j] = thingy;
 
-                String fileStr = thingy.toString();
-
-                // stateFileStrs.put(stateA,fileStr);
-
                 boardhelpr.put(shuffleAbs.get(counter), thingy); // adds (stateAbbr, (row,col)) pair to hashmap
 
                 cells[i][j].setGravity(Gravity.CENTER); //centers text in cell
@@ -232,12 +304,6 @@ public class Game extends Activity {
             }
         }
     }
-
-
-
-
-
-
 
 
     private void bingoCheckr(String stateStr){
@@ -262,7 +328,6 @@ public class Game extends Activity {
     // DO NOT CALL WHEN LOADING. Only call on NEWLY ADDED STATES.
     public void stateSetter(String stateStr){
 
-
         setstates.add(stateStr);
         score++;
 
@@ -274,10 +339,6 @@ public class Game extends Activity {
         String stateAb = stateAbbs.get(stateStr);
 
         boardhelpr.get(stateAb).setMarked(true);
-
-        String update = boardhelpr.get(stateAb).toString();
-
-        //stateFileStrs.put(stateAb,update);
 
         StateObject loc = boardhelpr.get(stateAb);
 
@@ -394,7 +455,6 @@ public class Game extends Activity {
 
         // board is complete!
         if(allCols[0] && allCols[1] && allCols[2]) {
-
             score = score + 60;
         }
 
@@ -490,6 +550,7 @@ public class Game extends Activity {
 
 
 
+
     // checks all rows and blocks
     private void rowCheckr(int row, int col){
 
@@ -524,8 +585,6 @@ public class Game extends Activity {
             }
         }
 
-
-
         if(row < 10 && row >=5) {
 
             boolean allTrue = true;
@@ -557,7 +616,6 @@ public class Game extends Activity {
                 }
             }
         }
-
 
         if(row < 15 && row >= 10) {
 
@@ -627,17 +685,13 @@ public class Game extends Activity {
     }
 
 
-    // TODO: WIP
+
     // method that performs actions after user selects state
     public void selectState(View v) { //public void selectState(String stateStr)
 
-        //TODO:
         // pop state from list of available states, rebuild adapter
         // add state/abbr to lists of selected states/abbrs
-
-        // score + 1
-        // check for bingo(s), maybe merge scoreCalc with bingoCheckr?
-
+        // check for bingo(s)
         // Update score accordingly
         // mark state on board
 
@@ -657,7 +711,6 @@ public class Game extends Activity {
         builder.setTitle("Choose State");
 
         ListAdapter adapter = new ArrayAdapter<String>(this, R.layout.dialogcustom, R.id.dialogtext, thing);
-
 
         final int[] chosen = {0};
         final String[] statechosen = {""};
@@ -688,7 +741,9 @@ public class Game extends Activity {
 
                 String stateF = statechosenS[0];
 
-                stateSetter(stateF);
+                if(!stateF.isEmpty()) {
+                    stateSetter(stateF);
+                }
 
             }
         });
@@ -699,12 +754,58 @@ public class Game extends Activity {
 
     }
 
-    //TODO
-    public void saveGame(View v){
+    public void saveGameButton(View v){
+        saveGame();
+    }
 
-        // CATCH EXCEPTION: when there isn't enough space,
-        // toast: sum ting wong with saving bro
-        Toast.makeText(getApplicationContext(), "Save Game: Coming soon!" , Toast.LENGTH_SHORT).show();
+
+    public void saveGame(){
+
+        List<String> lines = new ArrayList<>();
+
+        String scorestr = ""+ this.score + "\n";
+
+        String sb = scorestr;
+
+        lines.add(scorestr);
+
+        for(StateObject[] ar : cellar){
+            for(StateObject rc : ar){
+                lines.add(rc.toString());
+
+                sb = sb + rc.toString();
+
+            }
+        }
+
+        try {
+
+            File dir = new File(Environment.getExternalStorageDirectory().getAbsolutePath()+"/StatePlateBingo");
+
+            if(!dir.exists()){
+                dir.mkdirs();
+            }
+
+            File file = new File(dir, "continue.txt");
+
+
+
+
+            if (!file.exists()) {
+                file.createNewFile();
+            }
+
+            FileOutputStream stream = new FileOutputStream(file);
+
+            stream.write(sb.getBytes());
+
+            stream.close();
+
+            Toast.makeText(getApplicationContext(), "Saved!" , Toast.LENGTH_SHORT).show();
+
+        } catch (IOException e) {
+            //e.printStackTrace();
+        }
     }
 
 
@@ -714,27 +815,326 @@ public class Game extends Activity {
     }
 
     //TODO
-    public void loadGame(){
+    public void gameReader(){
 
         // IF THERE'S A CONTINUE, load it up!
         // If not, or something weird happens, catch exception, toast, and start new game.
 
+        // FOR EACH STRING IN FILE...
+
+        // State,Abb,Row,Col,marked
+
+        ArrayList<String> loadedStrs = new ArrayList<>();
+
+        // FIRST LINE IN ARRAY IS SCORE.
+
+        try {
+
+            String thing = Environment.getExternalStorageDirectory().getAbsolutePath()+"/StatePlateBingo";
+            File file = new File(thing, "continue.txt");
+
+            if (!file.exists()) {
+                Toast.makeText(getApplicationContext(), "No save found! Launching new game." , Toast.LENGTH_SHORT).show();
+
+                newGame();
+            }
+
+            if (file.exists()) {
+
+                FileInputStream input = new FileInputStream(file);
+                InputStreamReader rdr = new InputStreamReader(input);
+                BufferedReader br = new BufferedReader(rdr);
+                String line=br.readLine();
+                while (line != null) {
+
+                    //System.out.println(line);
+
+                    loadedStrs.add(line);
+
+                    line = br.readLine();
+
+                }
+
+                br.close();
+
+                loadHandler(loadedStrs);
+            }
+
+
+        }catch(Exception e){
+            //e.printStackTrace();
+        }
+
+
     }
 
-    private void loadBlocks(){ }
 
 
-    private void saveStrs(){ }
+    private void buildGridLoader(){
+
+        //cells = new TextView[20][3];
+        //cellCheck = new boolean[20][3];
+
+        // cellar = new StateObject[20][3];
+
+        // scales cells with screen size
+        final float scale = this.getResources().getDisplayMetrics().density;
+        int pixels = (int) (75 * scale + 0.5f);
+
+        for(int i = 0; i<20; i++){
+            for(int j=0; j<3; j++){
+
+                cells[i][j] = new TextView(this);
+                cells[i][j].setBackgroundResource(R.drawable.gridbutton);
+                cells[i][j].setForeground(getDrawable(R.drawable.gridbutton));
+
+                StateObject ob = cellar[i][j];
+
+                String ab = ob.getAbbr();
+                cells[i][j].setText(ab);
+                cells[i][j].setGravity(Gravity.CENTER); //centers text in cell
+
+                gridStr[i][j] = ob.getName();
+                cellCheck[i][j] = ob.isMarked();
+
+                if(ob.isMarked()){
+                    stateMarker(i,j);
+                    rowCheckLoad(i,j);
+                    colCheckLoad(i,j);
+                }
+
+
+                gl.addView(cells[i][j], pixels,pixels); // adds cell to grid with scaling
+
+            }
+        }
+    }
+
+
+
+
+    public void loadHandler(ArrayList<String> loadedStrs){
+
+        ArrayList<String> ls = loadedStrs;
+
+        String scorestr = ls.get(0).replaceAll("[^0-9]", "");
+
+        score = Integer.parseInt(scorestr);
+
+        scoreView.setText(String.valueOf(score));
+
+        for(int i = 1; i<ls.size(); i++){
+
+            String thing = ls.get(i);
+
+            String[] sa = thing.split(",");
+
+            String name = sa[0];
+            String ab = sa[1];
+
+            //shuffled.add(ab);
+
+            int r = Integer.parseInt(sa[2]);
+            int c = Integer.parseInt(sa[3]);
+
+            boolean m = false;
+
+            if(sa[4].equals("true")){
+                setstates.add(name);
+                m = true;
+            }
+
+            StateObject nuOb = new StateObject(r,c,name,ab);
+            nuOb.setMarked(m);
+
+            boardhelpr.put(ab, nuOb);
+
+            cellar[r][c] = nuOb;
+
+        }
+
+    }
+
+
+    public void stateMarker(int row, int col){
+
+
+        if(setstates.size()==60){
+            selector.setEnabled(false);
+        }
+
+
+        cellCheck[row][col] = true;
+
+        if(col == 0){
+            col1[row] = true;
+        }
+        if (col==1){
+            col2[row] = true;
+        }
+        if(col==2){
+            col3[row] = true;
+        }
+
+
+        if(row<5){
+            cells[row][col].setBackgroundResource(R.drawable.marker); //red
+        }
+        else if(row < 10 && row >=5) {
+            cells[row][col].setBackgroundResource(R.drawable.marker2); //blue
+        }
+
+        else if(row < 15 && row >= 10) {
+            cells[row][col].setBackgroundResource(R.drawable.marker3); //green/yellow
+        }
+        else  if(row < 20 && row >= 15) {
+            cells[row][col].setBackgroundResource(R.drawable.marker4); // orange
+        }
+        else {
+            cells[row][col].setBackgroundResource(R.drawable.errormark); //purple
+        }
+
+    }
+
+
+    // checks all rows and blocks. DOES NOT UPDATE SCORE.
+    private void rowCheckLoad(int row, int col){
+
+        if(row < 5) {
+            boolean allTrue = true;
+            for (int j = 0; j < 3; j++) {
+                if (!cellCheck[row][j]) {
+                    allTrue = false;
+                    break;
+                }
+            }
+
+            if (allTrue) {
+                block1rows[row] = true;
+
+            }
+        }
+
+        if(row < 10 && row >=5) {
+            boolean allTrue = true;
+            for (int j = 0; j < 3; j++) {
+
+                if (!cellCheck[row][j]) {
+                    allTrue = false;
+                    break;
+                }
+            }
+
+            if (allTrue) {
+                block2rows[row-5] = true;
+            }
+        }
+
+        if(row < 15 && row >= 10) {
+            boolean allTrue = true;
+            for (int j = 0; j < 3; j++) {
+
+                if (!cellCheck[row][j]) {
+                    allTrue = false;
+                    break;
+                }
+            }
+
+            if (allTrue) {
+                block3rows[row-10] = true;
+            }
+        }
+
+        if(row < 20 && row >= 15) {
+
+            boolean allTrue = true;
+
+            for (int j = 0; j < 3; j++) {
+
+                if (!cellCheck[row][j]) {
+                    allTrue = false;
+                    break;
+                }
+            }
+
+            if (allTrue) {
+                block4rows[row-15] = true;
+            }
+        }
+    }
+
+    // marks cols, DOES NOT UPDATE SCORE.
+    private void colCheckLoad(int row, int col){
+
+        if(col == 0){
+
+            col1[row] = true;
+
+            boolean allTrue=true;
+            for(boolean b : col1){
+                if (!b){
+                    allTrue=false;
+                    break;
+                }
+            }
+
+            if(allTrue){
+                allCols[col] = true;
+            }
+        }
+
+        if (col==1){
+
+            col2[row] = true;
+
+            boolean allTrue=true;
+            for(boolean b : col2){
+                if (!b){
+                    allTrue=false;
+                    break;
+                }
+            }
+
+            if(allTrue){
+                allCols[col] = true;
+            }
+        }
+
+
+        if(col==2){
+
+            col3[row] = true;
+
+            boolean allTrue=true;
+            for(boolean b : col3){
+                if (!b){
+                    allTrue=false;
+                    break;
+                }
+            }
+
+            if(allTrue){
+                allCols[col] = true;
+
+            }
+
+        }
+
+        // board is complete!
+        if(allCols[0] && allCols[1] && allCols[2]) { }
+
+    }
 
 
 
     // onClick for "Menu" button; goes to menu
-    //TODO: modify for save/continue support
     public void gotoSplash(View v){
 
         Intent intent = new Intent(this, Splash.class);
 
         intent.putExtra("CALLER", "Game");
+
+        saveGame();
 
         this.startActivity(intent);
     }
@@ -747,12 +1147,20 @@ public class Game extends Activity {
         String caller = "Game";
         intent.putExtra("CALLER", caller);
 
-        startActivity(intent);
+        saveGame();
 
-        //intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-        // startActivityIfNeeded(intent, 0);
+        startActivity(intent);
     }
 
+
+    @Override
+    public void onDestroy() {
+
+        saveGame();
+
+        super.onDestroy();
+
+    }
 
 
     //Row/Col for cells
@@ -765,8 +1173,6 @@ public class Game extends Activity {
         String abbr;
         boolean marked;
 
-        //boolean isMarked
-
         public StateObject(int row, int col, String name, String abbr){
             this.row=row;
             this.col=col;
@@ -777,6 +1183,10 @@ public class Game extends Activity {
 
         public String getName() {
             return this.name;
+        }
+
+        public String getAbbr() {
+            return this.abbr;
         }
 
         public int getCol() {
@@ -798,16 +1208,10 @@ public class Game extends Activity {
         @Override
         public String toString() {
 
-            String thing = this.name + " " + this.abbr + " " + this.row + " " + this.col + " " + this.marked;
-
-            // split by whitespace. NAME, ABBR, ROW, COL, MARKED
-            // parse...
+            String thing = this.name + "," + this.abbr + "," + this.row + "," + this.col + "," + this.marked +"\n";
 
             return thing;
-
-            //return super.toString();
         }
     }
-
-
+    
 }
