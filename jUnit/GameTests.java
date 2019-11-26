@@ -1,12 +1,8 @@
 import org.junit.*;
-
 import java.io.File;
-
 import static org.junit.Assert.*;
 
 public class GameTests {
-
-
     Game game1;
     String saveStr1;
     String loadStr1;
@@ -68,8 +64,6 @@ public class GameTests {
 
     @Test
     public void testScore(){
-
-
         if(game2 != null){
             assertEquals(game1.score, game2.score);
         }
@@ -89,7 +83,7 @@ public class GameTests {
 
         if(game2 != null){
 
-            assertEquals(saveStr1, game2.toString());
+            assertEquals(game1.toString(), game2.toString());
 
         }
         else{
@@ -109,3 +103,4 @@ public class GameTests {
     }
 
 }
+
