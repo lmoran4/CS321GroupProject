@@ -1,1 +1,8 @@
-To run, make sure Game.java (THIS VERSION ONLY!!!) and GameTests.java in the same folder.
+
+The Game.java in this folder is a modified "dummy" version of the original/actual Game.java.
+
+To run, make sure Game.java (THIS VERSION ONLY!!!) and GameTests.java are in the same folder.
+
+Do NOT put them in the same folder as the android project!
+
+THESE DO NOT INTERACT IN ANY WAY WITH THE ACTUAL GAME. 
