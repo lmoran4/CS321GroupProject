@@ -33,11 +33,7 @@ public class GameTests {
 
         game2 = loadGame("saved1");
 
-
-       // gameStr2 = game2.toString();
-
     }
-
 
     // load from a specific file
     public Game loadGame(String filename){
@@ -70,10 +66,6 @@ public class GameTests {
         return null;
     }
 
-
-
-    public void testShuffle() { }
-
     @Test
     public void testScore(){
 
@@ -87,34 +79,33 @@ public class GameTests {
 
     }
 
-    public void testSetstates(){ }
-
     @Test
     public void testSaveRead(){
-
-
         assertEquals(saveStr1,loadStr1);
-
     }
 
+    @Test
     public void testLoad(){
 
         if(game2 != null){
 
             assertEquals(saveStr1, game2.toString());
 
-            assertEquals(game1.cellar[10][11], game2.cellar[10][11]);
-
-
         }
         else{
             Assert.fail("Something went wrong with loading game2");
         }
-
-
     }
 
+    @Test
+    public void testGamesAreTheSame(){
 
-
+        if(game2 != null){
+            assertEquals(game1.cellar[10][1].toString(), game2.cellar[10][1].toString());
+        }
+        else {
+            Assert.fail("Something went wrong with loading game2");
+        }
+    }
 
 }
